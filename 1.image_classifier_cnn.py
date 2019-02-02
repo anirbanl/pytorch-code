@@ -4,6 +4,14 @@ import torchvision.transforms as transforms
 import random
 import os
 import numpy as np
+import argparse
+
+parser = argparse.ArgumentParser(description='PyTorch Image classification on CIFAR - simple CNN')
+parser.add_argument('--model_path', type=str, default='./models/cifar_model.tar',
+                    help='location of the model checkpoints')
+parser.add_argument('--max_epochs', type=int, default=2,
+                    help='upper epoch limit')
+args = parser.parse_args()
 
 def seed_everything(seed=1234):
     random.seed(seed)
@@ -65,7 +73,7 @@ import torch.optim as optim
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-PATH=os.path.join('.','cifar_model.tar')
+PATH=args.model_path
 if os.path.exists(PATH):
 	checkpoint=torch.load(PATH)
 	epoch = checkpoint['epoch']
@@ -73,7 +81,7 @@ if os.path.exists(PATH):
 	optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 else:
 	epoch=0
-for e in range(2):  # loop over the dataset multiple times
+for e in range(args.max_epochs):  # loop over the dataset multiple times
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs
