@@ -30,6 +30,8 @@ parser.add_argument('--temperature', type=float, default=1.0,
                     help='temperature - higher will increase diversity')
 parser.add_argument('--log-interval', type=int, default=100,
                     help='reporting interval')
+parser.add_argument('--start_word', type=str, default='he',
+                    help='reporting interval')
 args = parser.parse_args()
 
 # Set the random seed manually for reproducibility.
@@ -51,7 +53,7 @@ corpus = data.Corpus(args.data)
 ntokens = len(corpus.dictionary)
 hidden = model.init_hidden(1)
 try:
-	input=torch.tensor([[corpus.dictionary.word2idx['he']]],dtype=torch.long).to(device)
+	input=torch.tensor([[corpus.dictionary.word2idx[args.start_word]]],dtype=torch.long).to(device)
 except:
 	print('FAILED')
 	input = torch.randint(ntokens, (1, 1), dtype=torch.long).to(device)
