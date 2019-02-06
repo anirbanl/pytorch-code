@@ -12,6 +12,7 @@ from torchtext import datasets
 from model import SNLIClassifier
 from util import get_args, makedirs
 import spacy
+import json
 
 args = get_args()
 nlp = spacy.load('en')
@@ -68,3 +69,27 @@ with torch.no_grad():
 test_acc = 100. * n_test_correct / len(test)
 
 print('Test accuracy : %f'%(test_acc))
+
+def predict_entailment(s1_premise,s2_hypothesis,label=''):
+    tmap={}
+    tmap['sentence1'],tmap['sentence2'],tmap['gold_label'] = s1_premise,s2_hypothesis,label
+    with open('./.data/snli/snli_1.0/result.jsonl', 'w') as fp:
+        json.dump(tmap, fp)
+    a,b,c = datasets.SNLI.splits(inputs, answers, train='result.jsonl', validation='result.jsonl', test='result.jsonl')
+    a_iter,b_iter,c_iter = data.BucketIterator.splits((a,b,c), batch_size=args.batch_size, device=device)
+    batches=[(idx, batch) for idx, batch in enumerate(c_iter)]
+    with torch.no_grad():
+        answer=model(batches[0][1])
+    return {1:'entailment',2:'contradiction',3:'neutral'}[torch.max(answer, 1)[1].item()]
+
+predict_entailment("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road.")
+predict_entailment("A soccer game with multiple males playing.","Some men are playing a sport.")
+predict_entailment("A smiling costumed woman is holding an umbrella.","A happy woman in a fairy costume holds an umbrella.")
+predict_entailment("A person on a horse jumps over a broken down airplane.","A person is training his horse for a competition.")
+predict_entailment("A person on a horse jumps over a broken down airplane.","A person is at a diner, ordering an omelette.")
+predict_entailment("A person on a horse jumps over a broken down airplane.","A person is outdoors, on a horse.")
+predict_entailment("A person on a horse jumps over a broken down airplane.","A person is indoors, on a horse.")
+predict_entailment("A person on a horse jumps over a broken down airplane.","A person is outside, on a horse.")
+predict_entailment("A person on a horse jumps over a sofa.","A person is outside, on a horse.")
+predict_entailment("A person is beside a horse.","A person is outside, on a horse.")
+predict_entailment("A person is beside a boy.","A person is outside, on a horse.")
