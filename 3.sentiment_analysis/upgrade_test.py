@@ -69,7 +69,9 @@ def predict_sentiment(sentence):
     indexed = [TEXT.vocab.stoi[t] for t in tokenized]
     tensor = torch.LongTensor(indexed).to(device)
     tensor = tensor.unsqueeze(1)
-    prediction = torch.sigmoid(model(tensor))
+    with torch.no_grad():
+        model.eval()
+        prediction = torch.sigmoid(model(tensor))
     return prediction.item()
 
 print("This film is terrible",predict_sentiment("This film is terrible"))
