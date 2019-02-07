@@ -83,6 +83,16 @@ def predict_sentiment(sentence, min_len=5):
         prediction = torch.sigmoid(model(tensor))
     return prediction.item()
 
+def embed_sentence(s, min_len=5):
+    tokenized = [tok.text for tok in nlp.tokenizer(s.decode("utf-8"))]
+    if len(tokenized) < min_len:
+        tokenized += ['<pad>'] * (min_len - len(tokenized))
+    indexed = [TEXT.vocab.stoi[t] for t in tokenized]
+    tensor = torch.LongTensor(indexed).to(device)
+    tensor = tensor.unsqueeze(1)
+    emb=model.embedding(tensor)
+    return emb
+
 print("This film is terrible",predict_sentiment("This film is terrible"))
 print("This film is great",predict_sentiment("This film is great"))
 print("This film is not bad",predict_sentiment("This film is not bad"))
