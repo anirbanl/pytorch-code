@@ -28,15 +28,18 @@ class CNN(nn.Module):
         self.fc = nn.Linear(len(filter_sizes)*n_filters, output_dim)
         self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x):
+    def forward(self, x, embed=True):
 
-        #x = [sent len, batch size]
-
-        x = x.permute(1, 0)
-
-        #x = [batch size, sent len]
-
-        embedded = self.embedding(x)
+        if embed:
+            #x = [sent len, batch size]
+            x = x.permute(1, 0)
+            #x = [batch size, sent len]
+            embedded = self.embedding(x)
+        else:
+            #x = [sent len, batch size, emb_dim]
+            x = x.permute(1, 0, 2)
+            #x = [batch size, sent len, emb_dim]
+            embedded = x
 
         #embedded = [batch size, sent len, emb dim]
 
@@ -72,15 +75,10 @@ checkpoint=torch.load('./models/cnn_model.tar')
 model.load_state_dict(checkpoint['model_state_dict'])
 
 def predict_sentiment(sentence, min_len=5):
-    tokenized = [tok.text for tok in nlp.tokenizer(sentence.decode("utf-8"))]
-    if len(tokenized) < min_len:
-        tokenized += ['<pad>'] * (min_len - len(tokenized))
-    indexed = [TEXT.vocab.stoi[t] for t in tokenized]
-    tensor = torch.LongTensor(indexed).to(device)
-    tensor = tensor.unsqueeze(1)
+    emb=embed_sentence(sentence)
     with torch.no_grad():
         model.eval()
-        prediction = torch.sigmoid(model(tensor))
+        prediction = torch.sigmoid(model(emb, embed=False))
     return prediction.item()
 
 def embed_sentence(s, min_len=5):
