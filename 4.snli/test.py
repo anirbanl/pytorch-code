@@ -71,6 +71,12 @@ test_acc = 100. * n_test_correct / len(test)
 print('Test accuracy : %f'%(test_acc))
 
 def predict_entailment(s1_premise,s2_hypothesis,label=''):
+    batch, emb_p, emb_h = embed_pair(s1_premise, s2_hypothesis,label)
+    with torch.no_grad():
+        answer=model(batch, emb_p, emb_h, embed=False)
+    return answers.vocab[torch.max(answer, 1)[1].item()]
+
+def embed_pair(s1_premise, s2_hypothesis, label):
     tmap={}
     tmap['sentence1'],tmap['sentence2'],tmap['gold_label'] = s1_premise,s2_hypothesis,label
     with open('./.data/snli/snli_1.0/result.jsonl', 'w') as fp:
@@ -78,10 +84,9 @@ def predict_entailment(s1_premise,s2_hypothesis,label=''):
     a,b,c = datasets.SNLI.splits(inputs, answers, train='result.jsonl', validation='result.jsonl', test='result.jsonl')
     a_iter,b_iter,c_iter = data.BucketIterator.splits((a,b,c), batch_size=args.batch_size, device=device)
     batches=[(idx, batch) for idx, batch in enumerate(c_iter)]
-    with torch.no_grad():
-        answer=model(batches[0][1])
-    return {1:'entailment',2:'contradiction',3:'neutral'}[torch.max(answer, 1)[1].item()]
-
+    emb_p, emb_h = model.embed(batches[0][1].premise), model.embed(batches[0][1].hypothesis)
+    return batches[0][1], emb_p, emb_h
+    
 print(predict_entailment("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road."))
 print(predict_entailment("A soccer game with multiple males playing.","Some men are playing a sport."))
 print(predict_entailment("A smiling costumed woman is holding an umbrella.","A happy woman in a fairy costume holds an umbrella."))
