@@ -61,9 +61,12 @@ class SNLIClassifier(nn.Module):
             self.dropout,
             Linear(seq_in_size, config.d_out))
 
-    def forward(self, batch):
-        prem_embed = self.embed(batch.premise)
-        hypo_embed = self.embed(batch.hypothesis)
+    def forward(self, batch, p, h, embed=True):
+        if embed:
+            prem_embed = self.embed(batch.premise)
+            hypo_embed = self.embed(batch.hypothesis)
+        else:
+            prem_embed, hypo_embed = p,h
         if self.config.fix_emb:
             prem_embed =prem_embed.detach()
             hypo_embed =hypo_embed.detach()
