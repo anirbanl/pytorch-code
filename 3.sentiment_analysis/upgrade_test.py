@@ -27,13 +27,14 @@ class RNN(nn.Module):
         self.fc = nn.Linear(hidden_dim*2, output_dim)
         self.dropout = nn.Dropout(dropout)
         
-    def forward(self, x):
+    def forward(self, x, embed=True):
         
-        #x = [sent len, batch size]
-        
-        embedded = self.dropout(self.embedding(x))
-        
-        #embedded = [sent len, batch size, emb dim]
+        if embed:
+            #x = [sent len, batch size]
+            embedded = self.dropout(self.embedding(x))
+            #embedded = [sent len, batch size, emb dim]
+        else:
+            embedded = x
         
         output, (hidden, cell) = self.rnn(embedded)
         
@@ -65,13 +66,10 @@ checkpoint=torch.load('./models/upgrade_model.tar')
 model.load_state_dict(checkpoint['model_state_dict'])
 
 def predict_sentiment(sentence):
-    tokenized = [tok.text for tok in nlp.tokenizer(sentence.decode("utf-8"))]
-    indexed = [TEXT.vocab.stoi[t] for t in tokenized]
-    tensor = torch.LongTensor(indexed).to(device)
-    tensor = tensor.unsqueeze(1)
+    emb=embed_sentence(sentence)
     with torch.no_grad():
         model.eval()
-        prediction = torch.sigmoid(model(tensor))
+        prediction = torch.sigmoid(model(emb,embed=False))
     return prediction.item()
 
 def embed_sentence(s):
