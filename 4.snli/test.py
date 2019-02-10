@@ -74,7 +74,7 @@ def predict_entailment(s1_premise,s2_hypothesis,label=''):
     batch, emb_p, emb_h = embed_pair(s1_premise, s2_hypothesis,label)
     with torch.no_grad():
         answer=model(batch, emb_p, emb_h, embed=False)
-    return answers.vocab[torch.max(answer, 1)[1].item()]
+    return answers.vocab.itos[torch.max(answer, 1)[1].item()]
 
 def embed_pair(s1_premise, s2_hypothesis, label):
     tmap={}
