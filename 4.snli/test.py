@@ -63,7 +63,7 @@ model.eval()
 n_test_correct, test_loss = 0, 0
 with torch.no_grad():
     for test_batch_idx, test_batch in enumerate(test_iter):
-         answer = model(test_batch)
+         answer = model(test_batch, None, None)
          n_test_correct += (torch.max(answer, 1)[1].view(test_batch.label.size()) == test_batch.label).sum().item()
          #test_loss = criterion(answer, test_batch.label)
 test_acc = 100. * n_test_correct / len(test)
