@@ -265,13 +265,17 @@ def integrated_gradients(s, m=300):
     tokens=s.split(' ')
     relevances = sum_grad.detach().cpu().numpy()
     #print(list(np.round(np.reshape(relevances,len(tokens)),3)))
-    relevances = list(np.round(np.reshape(relevances,len(tokens)),3))
-    df = pd.DataFrame(index=['Sentence','IntegGrad'], columns=list(range(len(tokens))), data=[tokens, relevances])
-    print("Sentence : %s"%(s))
-    with pd.option_context('display.max_rows', None, 'display.max_columns', 30):
-        print(df)
-    print("PREDICTED Label : %s"%(LABEL.vocab.itos[pred]))
-    return LABEL.vocab.itos[pred], relevances
+    try:
+        relevances = list(np.round(np.reshape(relevances,len(tokens)),3))
+        df = pd.DataFrame(index=['Sentence','IntegGrad'], columns=list(range(len(tokens))), data=[tokens, relevances])
+        print("Sentence : %s"%(s))
+        with pd.option_context('display.max_rows', None, 'display.max_columns', 30):
+            print(df)
+        print("PREDICTED Label : %s"%(LABEL.vocab.itos[pred]))
+        return LABEL.vocab.itos[pred], relevances
+    except:
+        print "*****Error*******"
+        return LABEL.vocab.itos[pred], []
 
 integrated_gradients("This film is terrible")
 integrated_gradients("This film is great")
@@ -298,7 +302,7 @@ igmap={}
 count=0
 for i in range(len(test_data)):
     print(''.join(200*['-']))
-    p, r =integrated_gradients(' '.join(test_data.examples[i].__dict__['text']))
+    p, r =integrated_gradients(' '.join(test_data.examples[i].__dict__['text']).encode('utf-8'))
     l=test_data.examples[i].__dict__['label']
     print("TRUE Label : %s"%(l))
     match= (p==l)
@@ -311,5 +315,5 @@ print("Test accuracy : %f"%(count * 100.0 / len(test_data)))
 
 import json
 with open('rnn_sst_ig.jsonl','w') as fp:
-	json.dump(igmap, fp)
+    json.dump(igmap, fp)
 
