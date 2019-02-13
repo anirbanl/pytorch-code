@@ -304,6 +304,7 @@ print('Test accuracy : %f'%(test_acc))
 
 def predict_entailment(s1_premise,s2_hypothesis,label=''):
     p_emb, h_emb = embed_pair(s1_premise, s2_hypothesis,label)
+    emb = torch.cat((p_emb, h_emb), dim=0)
     with torch.no_grad():
         model.eval()
         answer = model(emb, [p_emb.size()[0], h_emb.size()[0]])
