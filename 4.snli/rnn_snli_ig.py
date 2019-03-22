@@ -368,3 +368,14 @@ def integrated_gradients(s1_premise, s2_hypothesis, m=300):
         return answers.vocab.itos[pred], []
 
 integrated_gradients("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road.")
+integrated_gradients("A soccer game with multiple males playing.","Some men are playing a sport.")
+integrated_gradients("A smiling costumed woman is holding an umbrella.","A happy woman in a fairy costume holds an umbrella.")
+integrated_gradients("A person on a horse jumps over a broken down airplane.","A person is training his horse for a competition.")
+integrated_gradients("A person on a horse jumps over a broken down airplane.","A person is at a diner, ordering an omelette.")
+integrated_gradients("A person on a horse jumps over a broken down airplane.","A person is outdoors, on a horse.")
+integrated_gradients("A person on a horse jumps over a broken down airplane.","A person is indoors, on a horse.")
+integrated_gradients("A person on a horse jumps over a broken down airplane.","A person is outside, on a horse.")
+integrated_gradients("A person on a horse jumps over a sofa.","A person is outside, on a horse.")
+integrated_gradients("A person is beside a horse.","A person is outside, on a horse.")
+integrated_gradients("A person is beside a boy.","A person is outside, on a horse.")
+
