@@ -326,12 +326,11 @@ print(predict_entailment("A person on a horse jumps over a sofa.","A person is o
 print(predict_entailment("A person is beside a horse.","A person is outside, on a horse."))
 print(predict_entailment("A person is beside a boy.","A person is outside, on a horse."))
 
+import pandas as pd
 def integrated_gradients(s1_premise, s2_hypothesis, m=300):
     p, h = embed_pair(s1_premise,s2_hypothesis,'')
     p_dash, h_dash = torch.zeros_like(p), torch.zeros_like(h)
     sum_grad = None
-    grad_array = None
-    x_array = None
     with torch.no_grad():
         model.eval()
         pred=torch.argmax(model(p, h))
@@ -350,11 +349,22 @@ def integrated_gradients(s1_premise, s2_hypothesis, m=300):
     sum_grad[0], sum_grad[1] = sum_grad[0] / m, sum_grad[1] / m
     sum_grad[0], sum_grad[1] = sum_grad[0] * (p - p_dash), sum_grad[1] * (h - h_dash)
     sum_grad[0], sum_grad[1] = sum_grad[0].sum(dim=2), sum_grad[1].sum(dim=2)
-    relevances = (sum_grad[0].detach().cpu().numpy(), sum_grad[1].detach().cpu().numpy())
-    ptokens=s1_premise.split(' ')
-    htokens=s2_hypothesis.split(' ')
+    relevances = [sum_grad[0].detach().cpu().numpy(), sum_grad[1].detach().cpu().numpy()]
+    ptokens=[tok.text for tok in nlp.tokenizer(s1_premise.decode("utf-8"))]
+    htokens=[tok.text for tok in nlp.tokenizer(s2_hypothesis.decode("utf-8"))]
     try:
-	    
-return relevances
+        relevances = [list(np.round(np.reshape(relevances[0],len(ptokens)),3)), list(np.round(np.reshape(relevances[1],len(htokens)),3))]
+        df1 = pd.DataFrame(index=['Premise','IntegGrad'], columns=list(range(len(ptokens))), data=[ptokens, relevances[0]])
+        df2 = pd.DataFrame(index=['Hypothesis','IntegGrad'], columns=list(range(len(htokens))), data=[htokens, relevances[1]])
+        print("Premise : %s"%(s1_premise))
+        print("Hypothesis : %s"%(s2_hypothesis))
+        with pd.option_context('display.max_rows', None, 'display.max_columns', 30):
+            print(df1)
+            print(df2)
+        print("PREDICTED Label : %s"%(answers.vocab.itos[pred]))
+        return answers.vocab.itos[pred], relevances
+    except:
+        print "*****Error*******"
+        return answers.vocab.itos[pred], []
 
 integrated_gradients("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road.")
