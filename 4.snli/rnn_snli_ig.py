@@ -379,3 +379,21 @@ integrated_gradients("A person on a horse jumps over a sofa.","A person is outsi
 integrated_gradients("A person is beside a horse.","A person is outside, on a horse.")
 integrated_gradients("A person is beside a boy.","A person is outside, on a horse.")
 
+igmap={}
+count=0
+for i in range(len(test)):
+    print(''.join(200*['-']))
+    p, r =integrated_gradients(' '.join(test.examples[i].__dict__['premise']).encode('utf-8'),' '.join(test.examples[i].__dict__['hypothesis']).encode('utf-8'))
+    l=test.examples[i].__dict__['label']
+    print("TRUE Label : %s"%(l))
+    match= (p==l)
+    print("%s"%({0:"WRONG",1:"CORRECT"}[int(match)]))
+    print(''.join(200*['-']))
+    if match:
+        count+=1
+    igmap[(' '.join(test.examples[i].__dict__['premise']).encode('utf-8'),' '.join(test.examples[i].__dict__['hypothesis']).encode('utf-8'))]=(p,r)
+print("Test accuracy : %f"%(count * 100.0 / len(test)))
+
+import cPickle as cp
+with open('rnn_snli_ig.pkl','wb') as fp:
+    cp.dump(igmap, fp)
