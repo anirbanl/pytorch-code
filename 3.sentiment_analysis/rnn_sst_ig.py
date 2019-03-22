@@ -313,7 +313,7 @@ for i in range(len(test_data)):
     igmap[' '.join(test_data.examples[i].__dict__['text'])]=(p,r)
 print("Test accuracy : %f"%(count * 100.0 / len(test_data)))
 
-import json
-with open('rnn_sst_ig.jsonl','w') as fp:
-    json.dump(igmap, fp)
+import cPickle as cp
+with open('rnn_sst_ig.pkl','wb') as fp:
+    cp.dump(igmap, fp)
 
