@@ -314,17 +314,17 @@ def predict_entailment(s1_premise,s2_hypothesis,label=''):
         answer = model(p_emb, h_emb)
     return answers.vocab.itos[torch.max(answer, 1)[1].item()]
 
-print(predict_entailment("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road."))
-print(predict_entailment("A soccer game with multiple males playing.","Some men are playing a sport."))
-print(predict_entailment("A smiling costumed woman is holding an umbrella.","A happy woman in a fairy costume holds an umbrella."))
-print(predict_entailment("A person on a horse jumps over a broken down airplane.","A person is training his horse for a competition."))
-print(predict_entailment("A person on a horse jumps over a broken down airplane.","A person is at a diner, ordering an omelette."))
-print(predict_entailment("A person on a horse jumps over a broken down airplane.","A person is outdoors, on a horse."))
-print(predict_entailment("A person on a horse jumps over a broken down airplane.","A person is indoors, on a horse."))
-print(predict_entailment("A person on a horse jumps over a broken down airplane.","A person is outside, on a horse."))
-print(predict_entailment("A person on a horse jumps over a sofa.","A person is outside, on a horse."))
-print(predict_entailment("A person is beside a horse.","A person is outside, on a horse."))
-print(predict_entailment("A person is beside a boy.","A person is outside, on a horse."))
+print("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road.",predict_entailment("A black race car starts up in front of a crowd of people.","A man is driving down a lonely road."))
+print("A soccer game with multiple males playing.","Some men are playing a sport.",predict_entailment("A soccer game with multiple males playing.","Some men are playing a sport."))
+print("A smiling costumed woman is holding an umbrella.","A happy woman in a fairy costume holds an umbrella.",predict_entailment("A smiling costumed woman is holding an umbrella.","A happy woman in a fairy costume holds an umbrella."))
+print("A person on a horse jumps over a broken down airplane.","A person is training his horse for a competition.",predict_entailment("A person on a horse jumps over a broken down airplane.","A person is training his horse for a competition."))
+print("A person on a horse jumps over a broken down airplane.","A person is at a diner, ordering an omelette.",predict_entailment("A person on a horse jumps over a broken down airplane.","A person is at a diner, ordering an omelette."))
+print("A person on a horse jumps over a broken down airplane.","A person is outdoors, on a horse.",predict_entailment("A person on a horse jumps over a broken down airplane.","A person is outdoors, on a horse."))
+print("A person on a horse jumps over a broken down airplane.","A person is indoors, on a horse.",predict_entailment("A person on a horse jumps over a broken down airplane.","A person is indoors, on a horse."))
+print("A person on a horse jumps over a broken down airplane.","A person is outside, on a horse.",predict_entailment("A person on a horse jumps over a broken down airplane.","A person is outside, on a horse."))
+print("A person on a horse jumps over a sofa.","A person is outside, on a horse.",predict_entailment("A person on a horse jumps over a sofa.","A person is outside, on a horse."))
+print("A person is beside a horse.","A person is outside, on a horse.",predict_entailment("A person is beside a horse.","A person is outside, on a horse."))
+print("A person is beside a boy.","A person is outside, on a horse.",predict_entailment("A person is beside a boy.","A person is outside, on a horse."))
 
 import pandas as pd
 def integrated_gradients(s1_premise, s2_hypothesis, m=300):
